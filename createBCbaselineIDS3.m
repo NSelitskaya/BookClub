@@ -1,0 +1,195 @@
+function [imageDS, dataSetFolders] = createBCbaselineIDS3(dataFolderTmpl, dataFolderSfx, readFcn)
+
+% Create a real folder
+dataFolder = strrep(dataFolderTmpl, 'Sfx', dataFolderSfx);
+
+
+%% Create a vector of the baseline sets
+
+% Empty vector
+dataSetFolders = strings(0);
+labels = strings(0);
+
+% Let's populate the vector by the baseline folder templates, one by one
+% 
+dataSetFolders = [dataSetFolders, 'S1_Sfx/S1NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S1_Sfx/S1NM2_Sfx'];
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S2_Sfx/S2NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM2_Sfx'];
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM3_Sfx'];
+labels = [labels, labelCur]; 
+%
+dataSetFolders = [dataSetFolders, 'S4_Sfx/S4NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+%
+dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM2_Sfx'];
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM3_Sfx'];
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM4_Sfx'];
+labels = [labels, labelCur]; 
+%
+dataSetFolders = [dataSetFolders, 'S6_Sfx/S6NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+%
+dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM2_Sfx'];
+labels = [labels, labelCur];
+dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM3_Sfx'];
+labels = [labels, labelCur];
+dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM3_Sfx'];
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S8_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+%
+dataSetFolders = [dataSetFolders, 'S9_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+%
+dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+%
+dataSetFolders = [dataSetFolders, 'S11_Sfx/S11NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S12_Sfx/S12NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S12_Sfx/S12NM2_Sfx'];
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S13_Sfx/S13NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S14_Sfx/S14NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+dataSetFolders = [dataSetFolders, 'S14_Sfx/S14NM2_Sfx'];
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S15_Sfx/S15NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S16_Sfx/S16NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S17_Sfx/S17NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S18_Sfx/S18NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S19_Sfx/S19NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S20_Sfx/S20NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+%
+dataSetFolders = [dataSetFolders, 'S21_Sfx/S21NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
+
+
+%% Replace Sfx template with the actual value
+dataSetFolders = strrep(dataSetFolders, 'Sfx', dataFolderSfx);
+labels = strrep(labels, 'Sfx', dataFolderSfx);
+
+% Build a full path  
+fullDataSetFolders = fullfile(dataFolder, dataSetFolders);
+
+
+[~, m] = size(labels);
+
+
+%% Create a Datastore of the baseline images with individual folder lables
+imageDS = imageDatastore(fullDataSetFolders, 'IncludeSubfolders', false,...
+                            'LabelSource', 'none');                        
+imageDS.ReadFcn = readFcn;
+
+
+%% Label images by top subject's folder name                        
+[n, ~] = size(imageDS.Files);  
+labelStr = strings(n,1);
+
+for j=1:m
+      
+    matches = contains(string(imageDS.Files), labels(j));
+    labelStr(matches) = labels(j); 
+    
+end
+
+imageDS.Labels = categorical(labelStr);
+
+end
+
