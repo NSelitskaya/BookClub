@@ -1,0 +1,77 @@
+function showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures,...
+    testSet, categoryClassifier, predictedLabelIdx, outFolder, mkTableRow)
+
+predictedLabels = categoryClassifier.Labels(predictedLabelIdx)';    
+M = [testSet.Files, testSet.Labels, predictedLabels];
+
+%rightTestFiles = M( string(M(:,2)) == string(M(:,3)), : );
+
+labels = unique(trainingSet.Labels, 'stable');
+[n, ~] = size(labels); 
+   
+%figure('Units', 'normalized', 'Position', [0 0 1 1]);
+
+[tmpStr, ~] = strsplit(testSet.Files{1,1}, '/');
+[~, nMatches] = size(tmpStr);
+mkLabel = tmpStr{1, nMatches-1};
+
+[nTestFiles, ~] = size(testSet.Files);
+readFcn = testSet.ReadFcn;
+
+fprintf("Finding SURF features matches from makeup %s images...\n", mkLabel);
+
+parfor i=1:n
+    fprintf("Makeup %s images classified as %s\n", mkLabel, labels(i));
+    
+    tmpStr = strings(nTestFiles,1);
+    tmpStr(:) = string(labels(i));
+
+    rightTestFiles = M( string(M(:,3)) == tmpStr, : );
+    [nFiles, ~] = size(rightTestFiles);
+    if nFiles == 0
+        continue
+    end
+    rightTestSet = imageDatastore(string(rightTestFiles(:,1)));
+    rightTestSet.ReadFcn = readFcn;
+
+    
+    %% Find a pair of the correctly identified test and training images with maximum matched features   
+    [mFiles, ~] = size(trainSets{i}.Files);
+    
+    % Iterate through correctly identified test set images
+    index_pairs_max = 0;
+    img1=[];
+    img2=[];
+    for k=1:nFiles
+        
+        % Detect features of the test image
+        [img1t, ~] = readimage(rightTestSet, k);
+        img1Pts = detectSURFFeatures(img1t);
+        [img1Features, ~] = extractFeatures(img1t,  img1Pts);        
+        
+        % Iterate through particular category of the training set
+        for l=1:mFiles
+            
+            % Detect features of the training image
+            img2Features = trainFeatures{l,i};
+            
+            % Find matching features in both images
+            index_pairs = matchFeatures(img1Features, img2Features);
+            [index_pairs_n, ~] = size(index_pairs);
+            if index_pairs_n > index_pairs_max
+                img1 = img1t;
+                [img2, ~] = readimage(trainSets{i}, l);
+                index_pairs_max = index_pairs_n;
+            end
+            
+        end
+        
+    end
+    
+    %% Display matching features for the selected images, and save diagrams into files
+    showFeatureMatches(img1, img2, mkLabel, labels(i), outFolder, mkTableRow{4+i});
+    
+    
+end
+
+end

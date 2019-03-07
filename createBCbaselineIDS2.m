@@ -55,7 +55,7 @@ dataSetFolders = [dataSetFolders, 'S9_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 %
-dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM1_Sfx'];
+dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM2_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(10), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -109,7 +109,12 @@ dataSetFolders = [dataSetFolders, 'S20_Sfx/S20NM1_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(20), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];
-
+%
+dataSetFolders = [dataSetFolders, 'S21_Sfx/S21NM1_Sfx'];
+[~, n] = size(dataSetFolders);
+[tmpStr, ~] = strsplit(dataSetFolders(n), '/');
+labelCur = tmpStr(1,1);
+labels = [labels, labelCur];
 
 %% Replace Sfx template with the actual value
 dataSetFolders = strrep(dataSetFolders, 'Sfx', dataFolderSfx);
@@ -139,7 +144,7 @@ for j=1:m
     
 end
 
-imageDS.Labels = labelStr;
+imageDS.Labels = categorical(labelStr);
 
 end
 

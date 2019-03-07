@@ -13,7 +13,7 @@ trainingSet = baseSet;
 
 % Count number of the classes ('stable' - presrvation of the order - to use
 % later for building confusion matrix)
-labels = unique(baseSet.Labels, 'stable');
+labels = unique(trainingSet.Labels, 'stable');
 [nClasses, ~] = size(labels);
 
 % Print image count for each label
@@ -53,7 +53,7 @@ opts = trainingOptions('sgdm',...
 
 %% Train the Network 
 % This process usually takes about 5-20 minutes on a desktop GPU. 
-myNet = trainNetwork(baseSet, layers, opts);
+myNet = trainNetwork(trainingSet, layers, opts);
     
     
 %% Makeup datasets
@@ -117,47 +117,3 @@ end
 %% Results
 varNames = cellstr(['TestFolder' 'Accuracy' 'BestGuess' 'GuessScore' string(labels)']);
 cell2table(mkTable, 'VariableNames', varNames)
-
-
-%% Display poi and matches
-%k = 1;
-%img1 = readimage(mkTestSet, k);
-%% Detect Features for First Image
-%img1Pts = detectSURFFeatures(img1);
-%[img1Features,  img1ValidPts] = extractFeatures(img1,  img1Pts);
-
-%figure; imshow(img1);
-%hold on; plot(img1Pts.selectStrongest(50));
-
-
-%% find one image from the best matching category
-%[n,~] = size(allImages.Files);
-%for m = 1:n
-    
-%    [img2, info] = readimage(allImages, m);
-%    if info.Label == maxAccCat
-        %info.Label
-%        break
-%    end
-%end
-
-%% display matching features
-%img2Pts = detectSURFFeatures(img2);
-%[img2Features,  img2ValidPts] = extractFeatures(img2,  img2Pts);
-
-%index_pairs = matchFeatures(img1Features, img2Features);
-
-%img1Matched_pts = img1ValidPts(index_pairs(:,1)).Location;
-%img2Matched_pts = img2ValidPts(index_pairs(:,2)).Location;
-
-%figure, 
-%showMatchedFeatures(img1, img2, img1Matched_pts,... 
-%                        img2Matched_pts, 'montage');
-
-%end %Makeups
-
-%dataSetFolder
-%fprintf("Training accuracy"); meanAccTrain
-%fprintf("Test accuracy");meanAcc
-
-%plotconfusion(categorical(knownLabelIdx), categorical(predictedLabelIdx));

@@ -18,7 +18,7 @@ dataSetFolders = [dataSetFolders, 'S1_Sfx/S1NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S1_Sfx/S1NM2_Sfx'];
-labels = [labels, labelCur];
+%labels = [labels, labelCur];
 %
 dataSetFolders = [dataSetFolders, 'S2_Sfx/S2NM1_Sfx'];
 [~, n] = size(dataSetFolders);
@@ -32,9 +32,9 @@ dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM2_Sfx'];
-labels = [labels, labelCur]; 
+%labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM3_Sfx'];
-labels = [labels, labelCur]; 
+%labels = [labels, labelCur]; 
 %
 dataSetFolders = [dataSetFolders, 'S4_Sfx/S4NM1_Sfx'];
 [~, n] = size(dataSetFolders);
@@ -48,11 +48,11 @@ dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM2_Sfx'];
-labels = [labels, labelCur]; 
+%labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM3_Sfx'];
-labels = [labels, labelCur]; 
+%labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM4_Sfx'];
-labels = [labels, labelCur]; 
+%labels = [labels, labelCur]; 
 %
 dataSetFolders = [dataSetFolders, 'S6_Sfx/S6NM1_Sfx'];
 [~, n] = size(dataSetFolders);
@@ -66,11 +66,11 @@ dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM2_Sfx'];
-labels = [labels, labelCur];
+%labels = [labels, labelCur];
 dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM3_Sfx'];
-labels = [labels, labelCur];
-dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM3_Sfx'];
-labels = [labels, labelCur];
+%labels = [labels, labelCur];
+dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM4_Sfx'];
+%labels = [labels, labelCur];
 %
 dataSetFolders = [dataSetFolders, 'S8_Sfx'];
 [~, n] = size(dataSetFolders);
@@ -89,12 +89,17 @@ dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM1_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(n), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
+dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM2_Sfx'];
 %
 dataSetFolders = [dataSetFolders, 'S11_Sfx/S11NM1_Sfx'];
 [~, n] = size(dataSetFolders);
 [tmpStr, ~] = strsplit(dataSetFolders(n), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];
+dataSetFolders = [dataSetFolders, 'S11_Sfx/S11NM2_Sfx'];
+%labels = [labels, labelCur];
+dataSetFolders = [dataSetFolders, 'S11_Sfx/S11NM3_Sfx'];
+%labels = [labels, labelCur];
 %
 dataSetFolders = [dataSetFolders, 'S12_Sfx/S12NM1_Sfx'];
 [~, n] = size(dataSetFolders);
@@ -102,7 +107,7 @@ dataSetFolders = [dataSetFolders, 'S12_Sfx/S12NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 dataSetFolders = [dataSetFolders, 'S12_Sfx/S12NM2_Sfx'];
-labels = [labels, labelCur];
+%labels = [labels, labelCur];
 %
 dataSetFolders = [dataSetFolders, 'S13_Sfx/S13NM1_Sfx'];
 [~, n] = size(dataSetFolders);
@@ -116,7 +121,7 @@ dataSetFolders = [dataSetFolders, 'S14_Sfx/S14NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];
 dataSetFolders = [dataSetFolders, 'S14_Sfx/S14NM2_Sfx'];
-labels = [labels, labelCur];
+%labels = [labels, labelCur];
 %
 dataSetFolders = [dataSetFolders, 'S15_Sfx/S15NM1_Sfx'];
 [~, n] = size(dataSetFolders);
@@ -182,8 +187,12 @@ imageDS.ReadFcn = readFcn;
 [n, ~] = size(imageDS.Files);  
 labelStr = strings(n,1);
 
+fprintf("Labeling base set...\n");
+
 for j=1:m
-      
+    
+    fprintf("Label %s\n", labels(j));
+     
     matches = contains(string(imageDS.Files), labels(j));
     labelStr(matches) = labels(j); 
     

@@ -11,10 +11,10 @@ mkLabels = strings(0);
 
 % Let's populate vectors one by one, making labels from the top directory
 mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1GL1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(1), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
-
 mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1HD1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur]; 
 mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1HD2_Sfx'];
@@ -33,18 +33,24 @@ mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1MK6_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1MK7_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1MK8_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1NM1_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S1_Sfx/S1NM2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S2_Sfx/S2HD1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(12), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur]; 
 mkDataSetFolders = [mkDataSetFolders, 'S2_Sfx/S2GL1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3HD1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(14), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3HD2_Sfx'];
@@ -57,13 +63,16 @@ mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3MK3_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3MK4_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3MK5_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3NM1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3NM3_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S4_Sfx/S4HD1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(22), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S4_Sfx/S4GL1_Sfx'];
@@ -72,7 +81,8 @@ mkDataSetFolders = [mkDataSetFolders, 'S4_Sfx/S4MK1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S5_Sfx/S5MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(25), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S5_Sfx/S5MK2_Sfx'];
@@ -89,19 +99,25 @@ mkDataSetFolders = [mkDataSetFolders, 'S5_Sfx/S5NM4_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S6_Sfx/S6MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(32), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S6_Sfx/S6MK2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(34), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7MK2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7MK3_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7HD1_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7HD2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7NM1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
@@ -109,7 +125,8 @@ mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7NM3_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(39), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10MK2_Sfx'];
@@ -118,16 +135,20 @@ mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10MK3_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10MK4_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10NM1_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(43), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11MK2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S12_Sfx/S12MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(45), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S12_Sfx/S12MK2_Sfx'];
@@ -136,12 +157,14 @@ mkDataSetFolders = [mkDataSetFolders, 'S12_Sfx/S12NM1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S13_Sfx/S13MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(48), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S14_Sfx/S14HD1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(49), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S14_Sfx/S14GL1_Sfx'];
@@ -152,34 +175,46 @@ mkDataSetFolders = [mkDataSetFolders, 'S14_Sfx/S14NM1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S15_Sfx/S15MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(53), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S16_Sfx/S16MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(54), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S17_Sfx/S17MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(55), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S18_Sfx/S18MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(56), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S19_Sfx/S19GL1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(57), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S19_Sfx/S19MK1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S20_Sfx/S20MK1_Sfx'];
-[tmpStr, ~] = strsplit(mkDataSetFolders(59), '/');
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
+mkLabelCur = tmpStr(1,1);
+mkLabels = [mkLabels, mkLabelCur];
+
+mkDataSetFolders = [mkDataSetFolders, 'S21_Sfx/S21MK1_Sfx'];
+[~, n] = size(mkDataSetFolders);
+[tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
 
