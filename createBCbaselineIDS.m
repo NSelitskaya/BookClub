@@ -48,7 +48,8 @@ dataSetFolders = [dataSetFolders, 'S18_Sfx/S18NM1_Sfx'];
 dataSetFolders = [dataSetFolders, 'S19_Sfx/S19NM1_Sfx'];
 %
 dataSetFolders = [dataSetFolders, 'S20_Sfx/S20NM1_Sfx'];
-
+%
+dataSetFolders = [dataSetFolders, 'S21_Sfx/S21NM1_Sfx'];
 
 %% Replace Sfx template with the actual value
 dataSetFolders = strrep(dataSetFolders, 'Sfx', dataFolderSfx);

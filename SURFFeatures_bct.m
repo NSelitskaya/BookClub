@@ -3,15 +3,16 @@ clear all; close all; clc;
 
 %% Dataset root folder template and suffix
 dataFolderTmpl = '~/data/BC1_Sfx';
-dataFolderSfx = '96x64';
-%dataFolderSfx = '1072x712';
+%dataFolderSfx = '96x64';
+dataFolderSfx = '1072x712';
 
 %% Folder for output files
 outFolder = '~/data/BCTutorialOut';
 
+global faceDetector
 
 %% Create imageDataset of all images in selected baseline folders
-[baseSet, dataSetFolder] = createBCbaselineIDS2(dataFolderTmpl,...
+[baseSet, dataSetFolder] = createBCbaselineIDS3(dataFolderTmpl,...
                             dataFolderSfx, @readFunctionGray_n);
 trainingSet = baseSet;
 
@@ -31,7 +32,10 @@ countEachLabel(trainingSet)
 
 
 %% Detect features on the trainingSet and build basis (vocabulary) of the bag
-bag = bagOfFeatures(trainingSet, 'PointSelection', 'Detector',...
+faceDetector = vision.CascadeObjectDetector(); % Default: finds faces 
+
+bag = bagOfFeatures(trainingSet, 'CustomExtractor', @extractFaceSURFFeatures,...
+                    'PointSelection', 'Detector',...
                     'Upright', false, 'VocabularySize', 500,...
                     'StrongestFeatures', 0.8, 'UseParallel', true);
 
@@ -56,23 +60,29 @@ categoryClassifier = trainImageCategoryClassifier(trainingSet, bag,...
              
  
 %% Makeup datasets  
-
 % Create imageDataset vector of images in selected makeup folders
 [testSets, testDataSetFolders] = createBCtestIDSvect2(dataFolderTmpl,...
                                 dataFolderSfx, @readFunctionGray_n);
 
 
-%%
+%% Allocate Confusion an Predicted Indexes matrixes of the needed size
 [nMakeups, ~] = size(testSets);
 
 mkTable = cell(nMakeups, nClasses+4);
 predictedLabelIdx = cell(nMakeups, 1);
 
-%%
+
+%% Run classifiers in parallel for each makeup test set
 i = 1;
-%par
-for i=1:nMakeups    
-   
+parfor i=1:nMakeups    
+
+    % Extract true label of the test subset (from the first full file name)
+    [tmpStr, ~] = strsplit(testSets{i}.Files{1,1}, '/');
+    [~, nMatches] = size(tmpStr);
+    mkLabel = tmpStr{1, nMatches-1};
+    fprintf("Processing %s makeup set", mkLabel);
+    
+    
     %% Evaluate the classifier on the test set images   
     [predictedLabelIdx{i}, score] = predict(categoryClassifier, testSets{i});
        
@@ -93,7 +103,7 @@ for i=1:nMakeups
     maxAcc = 0;
     
     j = 1;   
-    parfor j = 1:nClasses
+    for j = 1:nClasses
 
         tmpStr = strings(nFiles,1);
         tmpStr(:) = string(labels(j));
@@ -111,6 +121,7 @@ for i=1:nMakeups
     %mkTable{i,3} = maxAccCat;
     %mkTable{i,4} = maxAcc;
     
+    % Update confusion matrix row at once (parfor requirement)
     mkTable(i,:) = num2cell([testDataSetFolders(i) meanMkAcc maxAccCat maxAcc meanMkConf]);
     
 end
@@ -120,15 +131,16 @@ varNames = cellstr(['TestFolder' 'Accuracy' 'BestGuess' 'GuessScore' string(labe
 cell2table(mkTable, 'VariableNames', varNames)
 
 
-%%
-%
-[trainFeatures, trainSets] = extractSURFFeatures(trainingSet);
+%% Pre-extract SURF features and slice training set by labels once,
+% without doing that for each test set when finding matches below
+[trainFeatures, trainSets, trainBoxes] = preextractSURFFeatures(trainingSet);
 
-%%
+%% Iterate throug makeup test sets and find images with best (most numerous)
+% matches between each test set and training sub-sets sliced by labels
 i = 1;
 for i=1:nMakeups           
     %
-    showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures,...
+    showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures, trainBoxes,...
         testSets{i}, categoryClassifier, predictedLabelIdx{i}, outFolder, mkTable(i,:));
        
 end    

@@ -1,4 +1,4 @@
-function [imageDS, dataSetFolders] = createBCbaselineIDS2(dataFolderTmpl, dataFolderSfx, readFcn)
+function [imageDS, dataSetFolders] = createBCbaselineIDS2c(dataFolderTmpl, dataFolderSfx, readFcn)
 
 % Create a real folder
 dataFolder = strrep(dataFolderTmpl, 'Sfx', dataFolderSfx);
@@ -10,7 +10,7 @@ dataSetFolders = strings(0);
 labels = strings(0);
 
 % Let's populate the vector by the baseline folder templates, one by one
-dataSetFolders = [dataSetFolders, 'S1_Sfx/S1NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S1_Sfx/S1NM1_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(1), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -20,7 +20,7 @@ dataSetFolders = [dataSetFolders, 'S2_Sfx/S2NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];
 %
-dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM3_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(3), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -30,7 +30,7 @@ dataSetFolders = [dataSetFolders, 'S4_Sfx/S4NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 %
-dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM3_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(5), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -40,7 +40,7 @@ dataSetFolders = [dataSetFolders, 'S6_Sfx/S6NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 %
-dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S7_Sfx/S7NM3_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(7), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -55,7 +55,7 @@ dataSetFolders = [dataSetFolders, 'S9_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 %
-dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM1_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(10), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -65,7 +65,7 @@ dataSetFolders = [dataSetFolders, 'S11_Sfx/S11NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];
 %
-dataSetFolders = [dataSetFolders, 'S12_Sfx/S12NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S12_Sfx/S12NM1_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(12), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -75,7 +75,7 @@ dataSetFolders = [dataSetFolders, 'S13_Sfx/S13NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];
 %
-dataSetFolders = [dataSetFolders, 'S14_Sfx/S14NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S14_Sfx/S14NM1_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(14), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];

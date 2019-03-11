@@ -1,4 +1,4 @@
-function [imageDS, dataSetFolders] = createBCbaselineIDS2(dataFolderTmpl, dataFolderSfx, readFcn)
+function [imageDS, dataSetFolders] = createBCbaselineIDS2b(dataFolderTmpl, dataFolderSfx, readFcn)
 
 % Create a real folder
 dataFolder = strrep(dataFolderTmpl, 'Sfx', dataFolderSfx);

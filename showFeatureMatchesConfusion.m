@@ -1,16 +1,17 @@
-function showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures,...
+function showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures, trainBoxes,...
     testSet, categoryClassifier, predictedLabelIdx, outFolder, mkTableRow)
 
+% Create a vertical vector of 'objects' containing image file name% its true and predicted label
 predictedLabels = categoryClassifier.Labels(predictedLabelIdx)';    
 M = [testSet.Files, testSet.Labels, predictedLabels];
 
 %rightTestFiles = M( string(M(:,2)) == string(M(:,3)), : );
 
+% Create a list of labels present in the training set, preserving its occurrence order
 labels = unique(trainingSet.Labels, 'stable');
 [n, ~] = size(labels); 
-   
-%figure('Units', 'normalized', 'Position', [0 0 1 1]);
 
+% Extract true label of the test subset (from the first full file name)
 [tmpStr, ~] = strsplit(testSet.Files{1,1}, '/');
 [~, nMatches] = size(tmpStr);
 mkLabel = tmpStr{1, nMatches-1};
@@ -20,9 +21,11 @@ readFcn = testSet.ReadFcn;
 
 fprintf("Finding SURF features matches from makeup %s images...\n", mkLabel);
 
+% Iterate through all training set labels
 parfor i=1:n
-    fprintf("Makeup %s images classified as %s\n", mkLabel, labels(i));
+    %fprintf("Makeup %s images classified as %s\n", mkLabel, labels(i));
     
+    % Create a sub-imageDatastore containing test images classified with the given i-th label
     tmpStr = strings(nTestFiles,1);
     tmpStr(:) = string(labels(i));
 
@@ -35,10 +38,10 @@ parfor i=1:n
     rightTestSet.ReadFcn = readFcn;
 
     
-    %% Find a pair of the correctly identified test and training images with maximum matched features   
+    %% Find a pair of the test and training images with maximum matched features   
     [mFiles, ~] = size(trainSets{i}.Files);
     
-    % Iterate through correctly identified test set images
+    % Iterate through test set images with the given i-th label
     index_pairs_max = 0;
     img1=[];
     img2=[];
@@ -47,15 +50,16 @@ parfor i=1:n
         % Detect features of the test image
         [img1t, ~] = readimage(rightTestSet, k);
         img1Pts = detectSURFFeatures(img1t);
-        [img1Features, ~] = extractFeatures(img1t,  img1Pts);        
+        [img1Features, ~] = extractFeatures(img1t,  img1Pts, 'Upright', false);        
         
-        % Iterate through particular category of the training set
+        % Iterate through given category in the training set
         for l=1:mFiles
             
-            % Detect features of the training image
+            % Get features pre-detected the training image
             img2Features = trainFeatures{l,i};
             
-            % Find matching features in both images
+            % Find matching features in both images and identify images 
+            % with maximal number of them
             index_pairs = matchFeatures(img1Features, img2Features);
             [index_pairs_n, ~] = size(index_pairs);
             if index_pairs_n > index_pairs_max

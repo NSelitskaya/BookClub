@@ -67,6 +67,8 @@ mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3MK5_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3NM1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3NM2_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S3_Sfx/S3NM3_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
@@ -92,6 +94,8 @@ mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S5_Sfx/S5MK4_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S5_Sfx/S5NM1_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S5_Sfx/S5NM2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S5_Sfx/S5NM3_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
@@ -121,7 +125,11 @@ mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7HD2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7NM1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7NM2_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7NM3_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S7_Sfx/S7NM4_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10MK1_Sfx'];
@@ -136,6 +144,8 @@ mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10MK4_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10NM1_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S10_Sfx/S10NM2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11MK1_Sfx'];
@@ -155,6 +165,8 @@ mkDataSetFolders = [mkDataSetFolders, 'S12_Sfx/S12MK2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S12_Sfx/S12NM1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S12_Sfx/S12NM2_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S13_Sfx/S13MK1_Sfx'];
 [~, n] = size(mkDataSetFolders);
@@ -172,6 +184,8 @@ mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S14_Sfx/S14MK1_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 mkDataSetFolders = [mkDataSetFolders, 'S14_Sfx/S14NM1_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S14_Sfx/S14NM2_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S15_Sfx/S15MK1_Sfx'];
@@ -245,7 +259,7 @@ for i=1:nMakeups
     [n, ~] = size(mkImage.Files);  
     tmpStr = strings(n,1);
     tmpStr(:) = mkLabels(i);
-    mkImage.Labels = tmpStr; 
+    mkImage.Labels = categorical(tmpStr); 
                             
     countEachLabel(mkImage)    
     
