@@ -1,9 +1,5 @@
-function [trainFeatures, trainSets, trainBoxes] = preextractSURFFeatures(trainingSet)
-
-persistent faceDetector
-if isempty(faceDetector)
-    faceDetector = vision.CascadeObjectDetector(); 
-end
+function [trainSets,trainFeatures, trainMetrics, trainBoxes] =...
+    preextractSURFFeatures(trainingSet)
 
 % Create a list of labels present in the training set, preserving its occurrence order
 labels = unique(trainingSet.Labels, 'stable');
@@ -13,6 +9,7 @@ labels = unique(trainingSet.Labels, 'stable');
 labelCounts = table2cell(countEachLabel(trainingSet));
 nFiles = max(cell2mat(labelCounts(:,2)));
 trainFeatures = cell(nFiles, n);
+trainMetrics = cell(nFiles, n);
 trainBoxes = cell(nFiles, n);
 
 trainSets = cell(n, 1);
@@ -42,24 +39,12 @@ for i=1:n
         [img2t, ~] = readimage(rightTrainSet, l);
         
         %img2Pts = detectSURFFeatures(img2t);
-        %[img2Features,  ~] = extractFeatures(img2t,  img2Pts);
-        
-        bbox = faceDetector(img2t); % Detect faces
-        [m, n] = size(bbox);
-
-        if ~isempty(bbox) && m >= 1 && n == 4  
-            img2Pts = detectSURFFeatures(img2t, 'ROI', bbox(1, :));
-        else
-            [yLen, xLen] = size(img2t);
-            bbox = [xLen/2-xLen/6, yLen/2-yLen/6, xLen/3, yLen/3]; % [upper-left x y width hight]
-            img2Pts = detectSURFFeatures(img2t, 'ROI', bbox);
-        end
-        trainBoxes{l,i} = bbox(1);
-
-        [img2Features, ~] = extractFeatures(img2t,  img2Pts, 'Upright', false);
-                
+        %[img2Features,  ~] = extractFeatures(img2t,  img2Pts);        
+        [img2Features, face2Metrics, ~, face2Boxes] = extractFaceSURFFeatures2(img2t);
+                        
         trainFeatures{l,i} = img2Features;
-        
+        trainMetrics{l,i} = face2Metrics; 
+        trainBoxes{l,i} = face2Boxes; 
     end
        
 end

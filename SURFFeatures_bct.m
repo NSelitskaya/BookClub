@@ -9,7 +9,7 @@ dataFolderSfx = '1072x712';
 %% Folder for output files
 outFolder = '~/data/BCTutorialOut';
 
-global faceDetector
+%global faceDetector
 
 %% Create imageDataset of all images in selected baseline folders
 [baseSet, dataSetFolder] = createBCbaselineIDS3(dataFolderTmpl,...
@@ -32,7 +32,7 @@ countEachLabel(trainingSet)
 
 
 %% Detect features on the trainingSet and build basis (vocabulary) of the bag
-faceDetector = vision.CascadeObjectDetector(); % Default: finds faces 
+%faceDetector = vision.CascadeObjectDetector(); % Default: finds faces 
 
 bag = bagOfFeatures(trainingSet, 'CustomExtractor', @extractFaceSURFFeatures,...
                     'PointSelection', 'Detector',...
@@ -133,14 +133,15 @@ cell2table(mkTable, 'VariableNames', varNames)
 
 %% Pre-extract SURF features and slice training set by labels once,
 % without doing that for each test set when finding matches below
-[trainFeatures, trainSets, trainBoxes] = preextractSURFFeatures(trainingSet);
+%[trainSets, trainFeatures, trainMetrics, trainBoxes] = preextractSURFFeatures(trainingSet);
 
 %% Iterate throug makeup test sets and find images with best (most numerous)
 % matches between each test set and training sub-sets sliced by labels
-i = 1;
-for i=1:nMakeups           
+%i = 1;
+%for i=1:nMakeups           
     %
-    showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures, trainBoxes,...
-        testSets{i}, categoryClassifier, predictedLabelIdx{i}, outFolder, mkTable(i,:));
+%    showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures,...
+%        trainMetrics, trainBoxes, testSets{i}, categoryClassifier,...
+%        predictedLabelIdx{i}, outFolder, mkTable(i,:));
        
-end    
+%end    

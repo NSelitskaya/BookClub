@@ -1,10 +1,5 @@
 function showFeatureMatches(img1, img2, mkLabel, label, outFolder, accuracy)
 %% Display matching features for the test and training images
-%global faceDetector
-persistent faceDetector
-if isempty(faceDetector)
-    faceDetector = vision.CascadeObjectDetector(); 
-end
 
 if( ~isempty(img1) && ~isempty(img2) )
     
@@ -15,21 +10,10 @@ if( ~isempty(img1) && ~isempty(img2) )
      
     %img2Pts = detectSURFFeatures(img2);
     %[img2Features,  img2ValidPts] = extractFeatures(img2,  img2Pts, 'Upright', false);
+    [img2Features, ~, img2ValidPts, face2Boxes] = extractFaceSURFFeatures2(img2);
     
-    bbox = faceDetector(img2); % Detect faces
-    [m, n] = size(bbox);
-
-    if ~isempty(bbox) && m >= 1 && n == 4  
-        img2Pts = detectSURFFeatures(img2, 'ROI', bbox(1, :));
-    else
-        [yLen, xLen] = size(img2);
-        bbox = [xLen/2-xLen/6, yLen/2-yLen/6, xLen/3, yLen/3]; % [upper-left x y width hight]
-        img2Pts = detectSURFFeatures(img2, 'ROI', bbox);
-    end
-    [img2Features, img2ValidPts] = extractFeatures(img2,  img2Pts, 'Upright', false);
-    
-    img2 = insertShape(img2, 'Rectangle', bbox(1, :));    
-    [img2Pts_n, ~] = size(img2Pts);
+    img2 = insertShape(img2, 'Rectangle', face2Boxes, 'LineWidth', 5, 'Color', 'blue' );    
+    [img2Pts_n, ~] = size(img2ValidPts);
     
     
     % Find matching features and show them on the back-to-back montage
@@ -51,12 +35,12 @@ if( ~isempty(img1) && ~isempty(img2) )
     
     % Change horisontal coordinates of the second image features by the
     % first image length
-    [nPoints, ~] = size(img2Pts.Location);
+    [nPoints, ~] = size(img2ValidPts.Location);
     [~, xLen] = size(img1);
     offset = zeros(nPoints,1);
     offset(:) = xLen;
-    img2Pts.Location(:,1) = img2Pts.Location(:,1) + offset;
-    plot(img2Pts.selectStrongest(imgPts_n)); 
+    img2ValidPts.Location(:,1) = img2ValidPts.Location(:,1) + offset;
+    plot(img2ValidPts.selectStrongest(imgPts_n)); 
     
     %pause(1);
         

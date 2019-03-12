@@ -1,5 +1,6 @@
-function showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures, trainBoxes,...
-    testSet, categoryClassifier, predictedLabelIdx, outFolder, mkTableRow)
+function showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures,...
+    trainMetrics, trainBoxes, testSet, categoryClassifier, predictedLabelIdx,...
+    outFolder, mkTableRow)
 
 % Create a vertical vector of 'objects' containing image file name% its true and predicted label
 predictedLabels = categoryClassifier.Labels(predictedLabelIdx)';    
@@ -42,7 +43,8 @@ parfor i=1:n
     [mFiles, ~] = size(trainSets{i}.Files);
     
     % Iterate through test set images with the given i-th label
-    index_pairs_max = 0;
+    %index_pairs_max = 0;
+    weighted_sum_max = 0;
     img1=[];
     img2=[];
     for k=1:nFiles
@@ -57,15 +59,19 @@ parfor i=1:n
             
             % Get features pre-detected the training image
             img2Features = trainFeatures{l,i};
+            img2Metrics = trainMetrics{l,i};
             
             % Find matching features in both images and identify images 
             % with maximal number of them
             index_pairs = matchFeatures(img1Features, img2Features);
-            [index_pairs_n, ~] = size(index_pairs);
-            if index_pairs_n > index_pairs_max
+            %[index_pairs_n, ~] = size(index_pairs);
+            weighted_sum = sum(img2Metrics(index_pairs(:,2)));
+            %if index_pairs_n > index_pairs_max
+            if weighted_sum > weighted_sum_max
                 img1 = img1t;
                 [img2, ~] = readimage(trainSets{i}, l);
-                index_pairs_max = index_pairs_n;
+                weighted_sum_max = weighted_sum;
+                %index_pairs_max = index_pairs_n;
             end
             
         end
