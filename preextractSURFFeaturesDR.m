@@ -1,5 +1,5 @@
-function [trainSets, trainFeatures, trainMetrics, trainBoxes] =...
-    preextractSURFFeatures(trainingSet)
+function [trainSets, trainFeatures, trainMetrics] =...
+    preextractSURFFeaturesDR(bag, trainingSet)
 
 % Create a list of labels present in the training set, preserving its occurrence order
 labels = unique(trainingSet.Labels, 'stable');
@@ -10,7 +10,6 @@ labelCounts = table2cell(countEachLabel(trainingSet));
 nFiles = max(cell2mat(labelCounts(:,2)));
 trainFeatures = cell(nFiles, n);
 trainMetrics = cell(nFiles, n);
-trainBoxes = cell(nFiles, n);
 
 trainSets = cell(n, 1);
 
@@ -33,18 +32,16 @@ for i=1:n
     trainSets{i} = rightTrainSet;
                
     % Iterate through particular category of the training set
-    parfor l=1:mFiles
+    %par
+    for l=1:mFiles
             
         % Detect features of the training image
         [img2t, ~] = readimage(rightTrainSet, l);
         
-        %img2Pts = detectSURFFeatures(img2t);
-        %[img2Features,  ~] = extractFeatures(img2t,  img2Pts);        
-        [img2Features, face2Metrics, ~, face2Boxes] = extractFaceSURFFeatures2(img2t);
-                        
+        [img2Features, face2Metrics, ~] = bag.extractGoodFeatures(img2t, 0);
+        
         trainFeatures{l,i} = img2Features;
-        trainMetrics{l,i} = face2Metrics; 
-        trainBoxes{l,i} = face2Boxes; 
+        trainMetrics{l,i} = face2Metrics;  
     end
        
 end

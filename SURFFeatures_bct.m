@@ -9,7 +9,6 @@ dataFolderSfx = '1072x712';
 %% Folder for output files
 outFolder = '~/data/BCTutorialOut';
 
-%global faceDetector
 
 %% Create imageDataset of all images in selected baseline folders
 [baseSet, dataSetFolder] = createBCbaselineIDS3(dataFolderTmpl,...
@@ -34,15 +33,26 @@ countEachLabel(trainingSet)
 %% Detect features on the trainingSet and build basis (vocabulary) of the bag
 %faceDetector = vision.CascadeObjectDetector(); % Default: finds faces 
 
-bag = bagOfFeatures(trainingSet, 'CustomExtractor', @extractFaceSURFFeatures,...
-                    'PointSelection', 'Detector',...
-                    'Upright', false, 'VocabularySize', 500,...
-                    'StrongestFeatures', 0.8, 'UseParallel', true);
+%bag = bagOfFeatures(trainingSet,...
+%                    'PointSelection', 'Detector',...
+%                    'Upright', false, 'VocabularySize', 500,...
+%                    'StrongestFeatures', 0.8, 'UseParallel', true);
 
+%bag = bagOfFeatures(trainingSet, 'CustomExtractor', @extractFaceSURFFeatures,...
+%                    'PointSelection', 'Detector',...
+%                    'Upright', false, 'VocabularySize', 500,...
+%                    'StrongestFeatures', 0.8, 'UseParallel', true);
+                
+bag = bagOfFeatures3(trainingSet,...
+                    'PointSelection', 'Detector',...
+                    'Upright', false, 'VocabularySize', 600,...
+                    'StrongestFeatures', 0.8, 'UseParallel', true);
+                
+                    %'StrongestFeatures', 0.8, 
                                     
 %% Train the BOF classifier
 categoryClassifier = trainImageCategoryClassifier(trainingSet, bag,...
-                     'UseParallel', true);
+                    'UseParallel', true);
 
                  
 %% Evaluate the classifier on the test set images and display the confusion matrix
@@ -134,14 +144,18 @@ cell2table(mkTable, 'VariableNames', varNames)
 %% Pre-extract SURF features and slice training set by labels once,
 % without doing that for each test set when finding matches below
 %[trainSets, trainFeatures, trainMetrics, trainBoxes] = preextractSURFFeatures(trainingSet);
+[trainSets, trainFeatures, trainMetrics] = preextractSURFFeaturesDR(bag, trainingSet);
 
 %% Iterate throug makeup test sets and find images with best (most numerous)
 % matches between each test set and training sub-sets sliced by labels
 %i = 1;
-%for i=1:nMakeups           
+for i=1:nMakeups           
     %
 %    showFeatureMatchesConfusion(trainingSet, trainSets, trainFeatures,...
 %        trainMetrics, trainBoxes, testSets{i}, categoryClassifier,...
 %        predictedLabelIdx{i}, outFolder, mkTable(i,:));
-       
-%end    
+    showSURFFeatureDRMatchesConfusion(bag, trainingSet, trainSets, trainFeatures,...
+        trainMetrics, testSets{i}, categoryClassifier,...
+        predictedLabelIdx{i}, outFolder, mkTable(i,:));
+
+end    
