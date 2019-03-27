@@ -8,7 +8,7 @@ dataFolderSfx = '1072x712';
 
 
 % Create imageDataset of all images in selected baseline folders
-[baseSet, dataSetFolder] = createBCbaselineIDS3(dataFolderTmpl, dataFolderSfx, @readFunctionTrain_n);
+[baseSet, dataSetFolder] = createBCbaselineIDS2(dataFolderTmpl, dataFolderSfx, @readFunctionTrain_n);
 trainingSet = baseSet;
 
 % Count number of the classes ('stable' - presrvation of the order - to use
@@ -61,7 +61,7 @@ mkDataSetFolder = strings(0);
 mkLabel = strings(0);
 
 % Create imageDataset vector of images in selected makeup folders
-[testSets, testDataSetFolders] = createBCtestIDSvect3(dataFolderTmpl, dataFolderSfx, @readFunctionTrain_n);
+[testSets, testDataSetFolders] = createBCtestIDSvect2(dataFolderTmpl, dataFolderSfx, @readFunctionTrain_n);
 
 
 %%

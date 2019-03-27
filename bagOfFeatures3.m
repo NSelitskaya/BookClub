@@ -2,10 +2,68 @@ classdef bagOfFeatures3 < bagOfFeatures
     
     properties(Access = protected)
         goodClusterIdx;
+        clusterMembers;
+        SClusterMembers;
+        LClusterMembers;
     end
     
 
     methods (Access = public)
+        
+        %------------------------------------------------------------------
+        % Constructor
+        function obj = bagOfFeatures3(varargin)
+            
+            obj = obj@bagOfFeatures(varargin{:});
+
+        end % end of Constructor
+         
+        %------------------------------------------------------------------
+        function calculateGoodClusterIdx(this, calibrBag)
+            
+            %minNum = calibrBag.SClusterMembers(1);
+            %minDist = calibrBag.SClusterMembers(2);
+            %minDStd = calibrBag.SClusterMembers(3);
+            %minSym = calibrBag.SClusterMembers(4);
+            %minSStd = calibrBag.SClusterMembers(5);
+            
+            %maxNum = calibrBag.LClusterMembers(1);
+            %maxDist = calibrBag.LClusterMembers(2);
+            %maxDStd = calibrBag.LClusterMembers(3);
+            %maxSym = calibrBag.LClusterMembers(4);
+            %maxSStd = calibrBag.LClusterMembers(5);            
+            
+            %this.goodClusterIdx = ( this.clusterMembers(:,1) >= minNum &... 
+            %                        this.clusterMembers(:,1) <= maxNum &...
+            %                        this.clusterMembers(:,2) >= minDist &... 
+            %                        this.clusterMembers(:,2) <= maxDist &...
+            %                        this.clusterMembers(:,3) >= minDStd &... 
+            %                        this.clusterMembers(:,3) <= maxDStd &...
+            %                        this.clusterMembers(:,4) >= minSym &... 
+            %                        this.clusterMembers(:,4) <= maxSym &...
+            %                        this.clusterMembers(:,5) >= minSStd &... 
+            %                        this.clusterMembers(:,5) <= maxSStd |...
+            %                    this.clusterMembers(:,2) == 0 | this.clusterMembers(:,3) == 0 )';
+                            
+
+            [m, ~] = size(calibrBag.Vocabulary);
+            [n, ~] = size(this.Vocabulary);
+            vocabDif = zeros(n, m);
+            vocabGood = false(n, m);
+            
+            for i=1:m
+                vocabDifDim = this.Vocabulary - calibrBag.Vocabulary(i, :);
+                vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
+                %vocabGood(:, i) = vocabDif(:, i) < this.clusterMembers(:, 2) + 2*this.clusterMembers(:, 3);
+                vocabGood(:, i) = vocabDif(:, i) < calibrBag.clusterMembers(i, 7);
+            end
+            
+            this.goodClusterIdx = (sum(vocabGood, 2) > 0)';
+
+            n = sum(this.goodClusterIdx);
+            
+            fprintf('bagOfFeatures3: Trimmed clusters number: %d\n', n);    
+        end
         
         %------------------------------------------------------------------
         function [goodDescriptors, goodMetrics, goodPoints] = extractGoodFeatures(this, img, bad)
@@ -67,7 +125,7 @@ classdef bagOfFeatures3 < bagOfFeatures
             numVarargout = nargout-1;            
                         
             %DEBUG!!!
-            if params.UseParallel
+            if ~params.UseParallel
                 if numVarargout == 1
                     % Invoke 2 output syntax because of parfor limitations
                     % with varargout indexing.                                        
@@ -102,6 +160,10 @@ classdef bagOfFeatures3 < bagOfFeatures
             end
            
         end
+        
+        %------------------------------------------------------------------
+        % Copied directly from the standard bagOfFeatures.m with one
+        % addition
         %------------------------------------------------------------------
         % This routine computes a histogram of word occurrences for a given
         % input image.  It turns the input image into a feature vector
@@ -121,7 +183,9 @@ classdef bagOfFeatures3 < bagOfFeatures
             h = histcounts(single(matchIndex), 1:this.VocabularySize+1);
             
             % Filter out only good cluster center matches
-            h = h & this.goodClusterIdx;
+            %-------------------------------------------%
+            h = h & this.goodClusterIdx;                %
+            %-------------------------------------------%
             
             featureVector = single(h);
                      
@@ -168,42 +232,64 @@ classdef bagOfFeatures3 < bagOfFeatures
             clusterMemberNum = zeros(m, 1);
             clusterMemberDMean = zeros(m, 1);
             clusterMemberDStd = zeros(m, 1);
+            clusterMemberSMean = zeros(m, 1);
+            clusterMemberSStd = zeros(m, 1);
+            clusterMemberDMax = zeros(m, 1);
+            clusterMemberDPrc = zeros(m, 1);
             
             for i=1:m
                 tmpIdx = zeros(1, numDescriptors);
                 tmpIdx(:) = i;
                 ithAssignments = clusterAssignments( clusterAssignments == tmpIdx );
                 [~, n] = size(ithAssignments);
-                clusterMemberNum(i) = n;
+                clusterMemberNum(i) = n/numDescriptors;
                 
                 ithDescriptors = descriptors( clusterAssignments == tmpIdx, : );
                 ithDistDim = ithDescriptors - clusterCenters(i, :);
                 ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
                 clusterMemberDMean(i) = mean(ithDist);
                 clusterMemberDStd(i) = std(ithDist);
+                
+                clusterMemberSMean(i) = mean(mean(abs(ithDescriptors), 2));
+                clusterMemberSStd(i) = mean(std(abs(ithDescriptors), 0, 2));
+                
+                clusterMemberDMax(i) = max(ithDist);
+                clusterMemberDPrc(i) = prctile(ithDist, 95);
             end
             
-            clusterMembers = [clusterMemberNum, clusterMemberDMean, clusterMemberDStd];
+            this.clusterMembers = [clusterMemberNum, clusterMemberDMean,... 
+                clusterMemberDStd, clusterMemberSMean, clusterMemberSStd, clusterMemberDMax, clusterMemberDPrc];
             %fprintf('ClusterCenters & clusterAssignments');
             %array2table(clusterMembers, 'VariableNames',{'Num','Dist','Std'})
             
-            [S, L] = bounds(clusterMembers);
-            D = L - S;
+            this.SClusterMembers =... 
+                min(this.clusterMembers( this.clusterMembers(:,2) > 0 & this.clusterMembers(:,3) > 0, : ));
+            this.LClusterMembers =... 
+                max(this.clusterMembers( this.clusterMembers(:,2) > 0 & this.clusterMembers(:,3) > 0, : ));
+            %this.SClusterMembers =... 
+            %    min(this.clusterMembers);
+            %this.LClusterMembers =... 
+            %    max(this.clusterMembers);
+            
+            %D = this.LClusterMembers - this.SClusterMembers;
             %TS = S + D * 0.2;
             %TL = L - D * 0.2;
-            TS = mean(clusterMembers) - 1 * std(clusterMembers);
-            TL = mean(clusterMembers) + 1 * std(clusterMembers);
+            TS = mean(this.clusterMembers) - 2 * std(this.clusterMembers);
+            TL = mean(this.clusterMembers) + 2 * std(this.clusterMembers);
             
             %trimmedClusterCenters = clusterCenters( clusterMemberNum < TL(1) & clusterMemberDMean > TS(2) & clusterMemberDStd > TS(3), : );
             %trimmedClusterCenters = clusterCenters( clusterMemberDMean > TS(2), : );
             %trimmedClusterCenters = clusterCenters( clusterMemberNum < TL(1), : );
             %trimmedClusterCenters = clusterCenters( clusterMemberNum < TL(1) | clusterMemberDMean > TS(2) | clusterMemberDStd > TS(3), : );
-            %[n, ~] = size(trimmedClusterCenters);
-            
+            %[n, ~] = size(trimmedClusterCenters);            
             trimmedClusterCenters = clusterCenters;
+            
             %this.goodClusterIdx = ( clusterMemberNum < TL(1) | clusterMemberDMean > TS(2) | clusterMemberDStd > TS(3) )';
-            %this.goodClusterIdx = ( clusterMemberNum < TL(1) | clusterMemberDStd > TS(3) )';
-            this.goodClusterIdx = ( clusterMemberDStd > TS(3) )';
+            this.goodClusterIdx = ( clusterMemberNum < TL(1) | clusterMemberDStd > TS(3) )'; %best
+            %this.goodClusterIdx = ( clusterMemberDStd > TS(3) )';
+            %this.goodClusterIdx = ( clusterMemberDMean > TS(2) )';
+            %this.goodClusterIdx = ( clusterMemberNum < TL(1) & clusterMemberDMean > TS(2) & clusterMemberDStd > TS(3) )';
+            %this.goodClusterIdx = ( clusterMemberNum < TL(1) | (clusterMemberDMean > TS(2) & clusterMemberDStd > TS(3)) )';
             n = sum(this.goodClusterIdx);
             
             fprintf('bagOfFeatures3: Trimmed clusters number: %d\n', n);

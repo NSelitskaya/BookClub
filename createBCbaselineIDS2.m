@@ -20,7 +20,7 @@ dataSetFolders = [dataSetFolders, 'S2_Sfx/S2NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];
 %
-dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S3_Sfx/S3NM3_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(3), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
@@ -30,7 +30,7 @@ dataSetFolders = [dataSetFolders, 'S4_Sfx/S4NM1_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 %
-dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM2_Sfx'];
+dataSetFolders = [dataSetFolders, 'S5_Sfx/S5NM4_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(5), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 

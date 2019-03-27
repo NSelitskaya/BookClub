@@ -11,7 +11,7 @@ outFolder = '~/data/BCTutorialOut';
 
 
 %% Create imageDataset of all images in selected baseline folders
-[baseSet, dataSetFolder] = createBCbaselineIDS3(dataFolderTmpl,...
+[baseSet, dataSetFolder] = createBCbaselineIDS2(dataFolderTmpl,...
                             dataFolderSfx, @readFunctionGray_n);
 trainingSet = baseSet;
 
@@ -25,10 +25,13 @@ labels = unique(baseSet.Labels, 'stable');
 countEachLabel(trainingSet)
 
                             
-%% Split Database into Training & Test Sets in the ratio 80% to 20%
-%  Uncomment to test classifier on no-makeup images
-%[trainingSet, testSet] = splitEachLabel(baseSet, 0.8, 'randomize'); 
+%% Create a small set and bag with Face Detector feature extractor to calibrate 
+% parameters of clusters typical for faces in the base set
+[calibrSet, ~] = splitEachLabel(baseSet, 0.04, 'randomize'); 
 
+calibrBag = bagOfFeatures3(calibrSet, 'CustomExtractor', @extractFaceSURFFeatures,...
+                    'VocabularySize', 100, 'StrongestFeatures', 0.8,... 
+                    'UseParallel', true);
 
 %% Detect features on the trainingSet and build basis (vocabulary) of the bag
 %faceDetector = vision.CascadeObjectDetector(); % Default: finds faces 
@@ -45,10 +48,10 @@ countEachLabel(trainingSet)
                 
 bag = bagOfFeatures3(trainingSet,...
                     'PointSelection', 'Detector',...
-                    'Upright', false, 'VocabularySize', 600,...
+                    'Upright', false, 'VocabularySize', 500,...
                     'StrongestFeatures', 0.8, 'UseParallel', true);
                 
-                    %'StrongestFeatures', 0.8, 
+bag.calculateGoodClusterIdx(calibrBag);
                                     
 %% Train the BOF classifier
 categoryClassifier = trainImageCategoryClassifier(trainingSet, bag,...
