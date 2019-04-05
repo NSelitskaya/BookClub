@@ -60,7 +60,7 @@ dataSetFolders = [dataSetFolders, 'S10_Sfx/S10NM2_Sfx'];
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur]; 
 %
-dataSetFolders = [dataSetFolders, 'S11_Sfx/S11NM1_Sfx'];
+dataSetFolders = [dataSetFolders, 'S11_Sfx/S11NM2_Sfx'];
 [tmpStr, ~] = strsplit(dataSetFolders(11), '/');
 labelCur = tmpStr(1,1);
 labels = [labels, labelCur];

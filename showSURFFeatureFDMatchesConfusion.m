@@ -1,4 +1,4 @@
-function showSURFFeatureDRMatchesConfusion(bag, trainingSet, trainSets, trainFeatures,...
+function showSURFFeatureFDMatchesConfusion(bag, trainingSet, trainSets, trainFeatures,...
     trainMetrics, testSet, categoryClassifier, predictedLabelIdx,...
     outFolder, mkTableRow)
 
@@ -28,11 +28,10 @@ for i=1:n
     %fprintf("Makeup %s images classified as %s\n", mkLabel, labels(i));
     
     % Create a sub-imageDatastore containing test images classified with the given i-th label
-    %tmpStr = strings(nTestFiles,1);
-    %tmpStr(:) = string(labels(i));
+    tmpStr = strings(nTestFiles,1);
+    tmpStr(:) = string(labels(i));
 
-    %rightTestFiles = M( string(M(:,3)) == tmpStr, : );
-    rightTestFiles = M( string(M(:,3)) == string(labels(i)), : );
+    rightTestFiles = M( string(M(:,3)) == tmpStr, : );
     [nFiles, ~] = size(rightTestFiles);
     if nFiles == 0
         continue
@@ -52,8 +51,9 @@ for i=1:n
     for k=1:nFiles
         
         % Detect features of the test image
-        [img1t, ~] = readimage(rightTestSet, k);        
-        [img1Features, ~, ~, ~, ~, ~] = bag.extractGoodFeaturesByDist(img1t); 
+        [img1t, ~] = readimage(rightTestSet, k);   
+        [img1Features, ~] = extractFaceSURFFeatures(img1t); 
+        %[img1Features, ~] = extractNoFaceSURFFeatures(img1t);
         
         % Iterate through given category in the training set
         for l=1:mFiles
@@ -64,11 +64,7 @@ for i=1:n
             
             % Find matching features in both images and identify images 
             % with maximal number of them
-            %if i==3 && k==1 && l==11
-            %    fprintf("i=%d, k=%d, l=%d\n", i, k, l);
-            %end
-            
-            if ~isempty(img1Features) && ~isempty(img2Features)
+            if ~isempty(img1Features) && ~isempty(img2Features)            
                 index_pairs = matchFeatures(img1Features, img2Features);
                 %[index_pairs_n, ~] = size(index_pairs);
                 weighted_sum = sum(img2Metrics(index_pairs(:,2)));
@@ -86,7 +82,7 @@ for i=1:n
     end
     
     %% Display matching features for the selected images, and save diagrams into files
-    showSURFFeatureDRMatches(bag, img1, img2, mkLabel, labels(i), outFolder, mkTableRow{4+i});
+    showSURFFeatureFDMatches(bag, img1, img2, mkLabel, labels(i), outFolder, mkTableRow{4+i});
     
     
 end

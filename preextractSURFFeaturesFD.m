@@ -1,5 +1,5 @@
 function [trainSets, trainFeatures, trainMetrics] =...
-    preextractSURFFeaturesDR(bag, trainingSet)
+    preextractSURFFeaturesFD(bag, trainingSet)
 
 % Create a list of labels present in the training set, preserving its occurrence order
 labels = unique(trainingSet.Labels, 'stable');
@@ -38,7 +38,8 @@ for i=1:n
         % Detect features of the training image
         [img2t, ~] = readimage(rightTrainSet, l);
         
-        [img2Features, face2Metrics, ~, ~, ~, ~] = bag.extractGoodFeaturesByDist(img2t);
+        [img2Features, face2Metrics, ~] = extractFaceSURFFeatures(img2t);
+        %[img2Features, face2Metrics, ~] = extractNoFaceSURFFeatures(img2t);
         
         trainFeatures{l,i} = img2Features;
         trainMetrics{l,i} = face2Metrics;  

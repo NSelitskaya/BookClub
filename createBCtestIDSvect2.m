@@ -153,7 +153,11 @@ mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11MK1_Sfx'];
 [tmpStr, ~] = strsplit(mkDataSetFolders(n), '/');
 mkLabelCur = tmpStr(1,1);
 mkLabels = [mkLabels, mkLabelCur];
-mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11MK2_Sfx'];
+mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11NM1_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11NM2_Sfx'];
+mkLabels = [mkLabels, mkLabelCur];
+mkDataSetFolders = [mkDataSetFolders, 'S11_Sfx/S11NM3_Sfx'];
 mkLabels = [mkLabels, mkLabelCur];
 
 mkDataSetFolders = [mkDataSetFolders, 'S12_Sfx/S12MK1_Sfx'];

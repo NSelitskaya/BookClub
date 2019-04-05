@@ -1,19 +1,10 @@
-classdef bagOfFeatures3 < bagOfFeatures
+classdef bagOfFeatures4 < bagOfFeatures
     
     properties(Access = protected)
         
         % filtered bag by the calibration bags
         goodClusterIdx;
         badClusterIdx;
-        
-        goodCalibrBag; 
-        badCalibrBag;
-        
-        origDescriptors;
-        origVocabulary;
-        
-        Verbose;
-        UseParallel;
         
         % calibration bag clusters data
         clusterMembers;
@@ -27,12 +18,9 @@ classdef bagOfFeatures3 < bagOfFeatures
         
         %------------------------------------------------------------------
         % Constructor
-        function obj = bagOfFeatures3(t_goodCalibrBag, t_badCalibrBag, varargin)
+        function obj = bagOfFeatures4(varargin)
             
             obj = obj@bagOfFeatures(varargin{:});
-            
-            obj.goodCalibrBag = t_goodCalibrBag; 
-            obj.badCalibrBag = t_badCalibrBag;
 
         end % end of Constructor
          
@@ -63,7 +51,7 @@ classdef bagOfFeatures3 < bagOfFeatures
             %                        this.clusterMembers(:,5) <= maxSStd |...
             %                    this.clusterMembers(:,2) == 0 | this.clusterMembers(:,3) == 0 )';
                             
-            [n, ~] = size(this.origVocabulary);
+            [n, ~] = size(this.Vocabulary);
             
             if ~isempty(goodCalibrBag)
                 [m, ~] = size(goodCalibrBag.Vocabulary);                
@@ -71,7 +59,7 @@ classdef bagOfFeatures3 < bagOfFeatures
                 vocabGood = false(n, m);
             
                 for i=1:m
-                    vocabDifDim = this.origVocabulary - goodCalibrBag.Vocabulary(i, :);
+                    vocabDifDim = this.Vocabulary - goodCalibrBag.Vocabulary(i, :);
                     vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
                     %vocabGood(:, i) = vocabDif(:, i) < this.clusterMembers(:, 2) + 2*this.clusterMembers(:, 3);
                     vocabGood(:, i) = vocabDif(:, i) < goodCalibrBag.clusterMembers(i, 8);
@@ -89,7 +77,7 @@ classdef bagOfFeatures3 < bagOfFeatures
                 vocabBad = false(n, m);
             
                 for i=1:m
-                    vocabDifDim = this.origVocabulary - badCalibrBag.Vocabulary(i, :);
+                    vocabDifDim = this.Vocabulary - badCalibrBag.Vocabulary(i, :);
                     vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
                     %vocabGood(:, i) = vocabDif(:, i) < this.clusterMembers(:, 2) + 2*this.clusterMembers(:, 3);
                     vocabBad(:, i) = vocabDif(:, i) < badCalibrBag.clusterMembers(i, 7);
@@ -147,196 +135,87 @@ classdef bagOfFeatures3 < bagOfFeatures
             badLocations = locations( badClusterIdx2(matchIndex), :);
             badPoints = points( badClusterIdx2(matchIndex), :);
                       
-        end         
-
-
-        %------------------------------------------------------------------
-        function [goodDescriptors, goodMetrics, goodPoints,...
-                badDescriptors, badMetrics, badPoints] = extractGoodFeaturesByDist(this, img)
-                                      
-            [descriptors, metrics, locations] = this.Extractor(img);
-            points = this.determineExtractionPoints(img);
-                                
-            opts = getSearchOptions(this);
-            
-            matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
-            
-            ithDistDim = descriptors - this.Vocabulary(matchIndex, :);
-            ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
-            
-            goodIdx = ithDist < this.clusterMembers(matchIndex, 8);
-            goodDescriptors = descriptors( goodIdx, :);
-            goodMetrics = metrics( goodIdx, :);
-            goodPoints = points( goodIdx, :);
-            
-            badIdx = ~goodIdx;
-            badDescriptors = descriptors( badIdx, :);
-            badMetrics = metrics( badIdx, :);
-            badPoints = points( badIdx, :);
-        end        
+        end 
         
-        
-        %------------------------------------------------------------------
-        function [goodDescriptors] = filterGoodFeaturesByDist(this, descriptors)                                     
-                                
-            opts = getSearchOptions(this);
-            
-            matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
-                   
-            
-            ithDistDim = descriptors - this.Vocabulary(matchIndex, :);
-            ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
-            goodDescriptors = descriptors( ithDist < this.clusterMembers(matchIndex, 8), :);
-            %goodDescriptors = descriptors( ithDist < this.clusterMembers(matchIndex, 6), :);
-            
-        end        
         
         
         %------------------------------------------------------------------
         function [goodDescriptors] = filterGoodFeatures(this, descriptors)
-                                                                
+                                
             opts = getSearchOptions(this);
             
             matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
             
-            %goodClusterIdx2 = this.goodClusterIdx & ~this.badClusterIdx;
-            goodClusterIdx2 = this.goodClusterIdx | ~this.badClusterIdx;
-            %goodClusterIdx2 = ~this.badClusterIdx;
-            %goodClusterIdx2 = this.goodClusterIdx;
+            [m, ~] = size(this.Vocabulary);
+            goodClusterIdx2 = true(1, m);
             
-            goodDescriptors = descriptors( goodClusterIdx2(matchIndex), :);
-        end 
-        
-        %------------------------------------------------------------------
-        function trimmedClusterCenters = recreateVocabulary(this, t_goodCalibrBag, t_badCalibrBag)
-
-            this.goodCalibrBag = t_goodCalibrBag; 
-            this.badCalibrBag = t_badCalibrBag;
-
-            [goodDescriptors] = this.filterGoodFeatures(this.origDescriptors);
+            if ~isempty(this.goodClusterIdx)
+                goodClusterIdx2 = goodClusterIdx2 & this.goodClusterIdx;
+            end    
+            if ~isempty(this.badClusterIdx)
+                %goodClusterIdx2 = goodClusterIdx2 & ~this.badClusterIdx;
+                goodClusterIdx2 = goodClusterIdx2 | ~this.badClusterIdx;
+            end           
             
-            numDescriptors = size(goodDescriptors, 1);
-            %--------EOCHANGED---------------------------------------------
-            
-            K = min(numDescriptors, this.VocabularySize); % can't ask for more than you provide
-            
-            if K == 0
-                error(message('vision:bagOfFeatures:zeroVocabSize'))
-            end
-            
-            %if K < this.VocabularySize
-            %    warning(message('vision:bagOfFeatures:reducingVocabSize', ...
-            %        K, this.VocabularySize));
-
-            %    this.VocabularySize = K; 
-            %end                                              
-            
-            %--------CHANGED-----------------------------------------------
-            % New from here for bad/good clusters calibration bags
-            %--------------------------------------------------------------
-            [trimmedClusterCenters, clusterAssignments] = vision.internal.approximateKMeans(goodDescriptors, K, ...
-                'Verbose', this.Verbose, 'UseParallel', this.UseParallel);
-            
-            %this.origVocabulary = this.Vocabulary;
-            [n, ~] = size(this.Vocabulary);
-            this.goodClusterIdx = true(n, 1);
-            this.badClusterIdx = false(n, 1);
-            
-            [m, ~] = size(trimmedClusterCenters);
-            clusterMemberNum = zeros(m, 1);
-            clusterMemberDMean = zeros(m, 1);
-            clusterMemberDStd = zeros(m, 1);
-            clusterMemberSMean = zeros(m, 1);
-            clusterMemberSStd = zeros(m, 1);
-            clusterMemberDMax = zeros(m, 1);
-            clusterMemberDPrcS = zeros(m, 1);
-            clusterMemberDPrcL = zeros(m, 1);
-            
-            for i=1:m
-                ithAssignments = clusterAssignments( clusterAssignments == i );
-                [~, n] = size(ithAssignments);
-                clusterMemberNum(i) = n/numDescriptors;
-                
-                ithDescriptors = goodDescriptors( clusterAssignments == i, : );
-                ithDistDim = ithDescriptors - trimmedClusterCenters(i, :);
-                ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
-                clusterMemberDMean(i) = mean(ithDist);
-                clusterMemberDStd(i) = std(ithDist);
-                
-                clusterMemberSMean(i) = mean(mean(abs(ithDescriptors), 2));
-                clusterMemberSStd(i) = mean(std(abs(ithDescriptors), 0, 2));
-                
-                clusterMemberDMax(i) = max(ithDist);
-                clusterMemberDPrcS(i) = prctile(ithDist, 90); %bad
-                clusterMemberDPrcL(i) = prctile(ithDist, 85); %good 75 82 90
-            end
-            
-            this.clusterMembers = [clusterMemberNum, clusterMemberDMean,... 
-                clusterMemberDStd, clusterMemberSMean, clusterMemberSStd,...
-                clusterMemberDMax, clusterMemberDPrcS, clusterMemberDPrcL];
-            
-            this.Vocabulary = trimmedClusterCenters;
-            %--------EOCHANGED---------------------------------------------
-            
-            this.initializeVocabularySearchTree();
-                                        
-        end
-        
-    end
+                        
+            goodDescriptors = descriptors( goodClusterIdx2(matchIndex), :);           
           
+        end         
+        
+    end      
     
     methods (Hidden, Access = protected)
         
         %------------------------------------------------------------------        
         % Encode a scalar image set. Use parfor if requested.
         %------------------------------------------------------------------
-        %function [features, varargout] = encodeScalarImageSet(this, imgSet, params)
+        function [features, varargout] = encodeScalarImageSet(this, imgSet, params)
             
-        %    validateattributes(imgSet,{'imageSet','matlab.io.datastore.ImageDatastore'},{'scalar'},mfilename);
+            validateattributes(imgSet,{'imageSet','matlab.io.datastore.ImageDatastore'},{'scalar'},mfilename);
             
-        %    numImages = numel(imgSet.Files);
+            numImages = numel(imgSet.Files);
             
-        %    features = bagOfFeatures.allocateFeatureVector(numImages, this.VocabularySize, params.SparseOutput); 
-        %    words    = bagOfFeatures.allocateVisualWords(numImages);
+            features = bagOfFeatures.allocateFeatureVector(numImages, this.VocabularySize, params.SparseOutput); 
+            words    = bagOfFeatures.allocateVisualWords(numImages);
             
-        %    numVarargout = nargout-1;            
+            numVarargout = nargout-1;            
                         
             %DEBUG!!!
-        %    if ~params.UseParallel
-        %        if numVarargout == 1
+            if ~params.UseParallel
+                if numVarargout == 1
                     % Invoke 2 output syntax because of parfor limitations
                     % with varargout indexing.                                        
                                                   
-        %            parfor j = 1:numImages
-        %                img = imgSet.readimage(j); %#ok<PFBNS>
-        %                [features(j,:), words(j)]  = this.encodeSingleImage(img, params); %#ok<PFBNS>                        
-        %            end                
+                    parfor j = 1:numImages
+                        img = imgSet.readimage(j); %#ok<PFBNS>
+                        [features(j,:), words(j)]  = this.encodeSingleImage(img, params); %#ok<PFBNS>                        
+                    end                
                     
-        %            varargout{1} = words;
-        %        else                    
-        %            parfor j = 1:numImages
-        %                img = imgSet.readimage(j); %#ok<PFBNS>
-        %                features(j,:)  = this.encodeSingleImage(img, params); %#ok<PFBNS>
-        %            end
-        %        end
-        %    else % do not use parfor         
-        %         if numVarargout == 1                                              
+                    varargout{1} = words;
+                else                    
+                    parfor j = 1:numImages
+                        img = imgSet.readimage(j); %#ok<PFBNS>
+                        features(j,:)  = this.encodeSingleImage(img, params); %#ok<PFBNS>
+                    end
+                end
+            else % do not use parfor         
+                 if numVarargout == 1                                              
                                                   
-        %            for j = 1:numImages
-        %                img = imgSet.readimage(j);
-        %                [features(j,:), words(j)]  = this.encodeSingleImage(img, params);                       
-        %            end                
+                    for j = 1:numImages
+                        img = imgSet.readimage(j);
+                        [features(j,:), words(j)]  = this.encodeSingleImage(img, params);                       
+                    end                
                     
-        %            varargout{1} = words;
-        %        else                    
-        %            for j = 1:numImages
-        %                img = imgSet.readimage(j);
-        %                features(j,:)  = this.encodeSingleImage(img, params);
-        %            end
-        %         end
-        %    end
+                    varargout{1} = words;
+                else                    
+                    for j = 1:numImages
+                        img = imgSet.readimage(j);
+                        features(j,:)  = this.encodeSingleImage(img, params);
+                    end
+                 end
+            end
            
-        %end
+        end
         
         %------------------------------------------------------------------
         % Copied directly from the standard bagOfFeatures.m with one
@@ -353,24 +232,24 @@ classdef bagOfFeatures3 < bagOfFeatures
                 descriptors = this.Extractor(img);
             end
             
-            [goodDescriptors] = this.filterGoodFeaturesByDist(descriptors);
+            %[goodDescriptors] = this.filterGoodFeatures(descriptors);            
                                             
             opts = getSearchOptions(this);
             
-            matchIndex = this.VocabularySearchTree.knnSearch(goodDescriptors, 1, opts); % K = 1
-            
+            matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
+             
                        
             h = histcounts(single(matchIndex), 1:this.VocabularySize+1);
             
             % Filter out only good cluster center matches
             %-------------------------------------------%
-            %if ~isempty(this.goodClusterIdx)
-            %    h = h & this.goodClusterIdx;                
-            %end
+            if ~isempty(this.goodClusterIdx)
+                h = h & this.goodClusterIdx;                
+            end
             
-            %if ~isempty(this.badClusterIdx)
-            %    h = h & ~this.badClusterIdx;                
-            %end
+            if ~isempty(this.badClusterIdx)
+                h = h & ~this.badClusterIdx;                
+            end
             %-------------------------------------------%
             
             featureVector = single(h);
@@ -411,26 +290,15 @@ classdef bagOfFeatures3 < bagOfFeatures
             %    this.VocabularySize = K; 
             %end                                              
             
-            %--------CHANGED-----------------------------------------------
+            %--------------------------------------------------------------
             % New from here for bad/good clusters calibration bags
             %--------------------------------------------------------------
-            
-            global goodCalibrBag
-            global badCalibrBag
-            
-            this.origDescriptors = descriptors;
-
-            this.Verbose = params.Verbose;
-            this.UseParallel = params.UseParallel;
-
-            
             [clusterCenters, clusterAssignments] = vision.internal.approximateKMeans(descriptors, K, ...
                 'Verbose', params.Verbose, 'UseParallel', params.UseParallel);
             
-            this.origVocabulary = clusterCenters;
-            [n, ~] = size(this.origVocabulary);
+            [n, ~] = size(this.Vocabulary);
             this.goodClusterIdx = true(n, 1);
-            this.badClusterIdx = false(n, 1);
+            this.badClusterIdx = true(n, 1);
             
             [m, ~] = size(clusterCenters);
             clusterMemberNum = zeros(m, 1);
@@ -443,10 +311,14 @@ classdef bagOfFeatures3 < bagOfFeatures
             clusterMemberDPrcL = zeros(m, 1);
             
             for i=1:m
+                %tmpIdx = zeros(1, numDescriptors);
+                %tmpIdx(:) = i;
+                %ithAssignments = clusterAssignments( clusterAssignments == tmpIdx );
                 ithAssignments = clusterAssignments( clusterAssignments == i );
                 [~, n] = size(ithAssignments);
                 clusterMemberNum(i) = n/numDescriptors;
                 
+                %ithDescriptors = descriptors( clusterAssignments == tmpIdx, : );
                 ithDescriptors = descriptors( clusterAssignments == i, : );
                 ithDistDim = ithDescriptors - clusterCenters(i, :);
                 ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
@@ -457,26 +329,13 @@ classdef bagOfFeatures3 < bagOfFeatures
                 clusterMemberSStd(i) = mean(std(abs(ithDescriptors), 0, 2));
                 
                 clusterMemberDMax(i) = max(ithDist);
-                clusterMemberDPrcS(i) = prctile(ithDist, 99); %bad 90
-                clusterMemberDPrcL(i) = prctile(ithDist, 99); %good 99
+                clusterMemberDPrcS(i) = prctile(ithDist, 90); %bad
+                clusterMemberDPrcL(i) = prctile(ithDist, 90); %good
             end
             
             this.clusterMembers = [clusterMemberNum, clusterMemberDMean,... 
                 clusterMemberDStd, clusterMemberSMean, clusterMemberSStd,...
                 clusterMemberDMax, clusterMemberDPrcS, clusterMemberDPrcL];
-          
-
-            if ~isempty(goodCalibrBag) && ~isempty(badCalibrBag)
-                this.goodCalibrBag = goodCalibrBag;
-                this.badCalibrBag = badCalibrBag;
-                this.calculateGoodClusterIdx(this.goodCalibrBag, this.badCalibrBag);
-                %trimmedClusterCenters = clusterCenters(this.goodClusterIdx & ~this.badClusterIdx,:); 
-                %[K, ~] = size(trimmedClusterCenters);
-                %this.VocabularySize = K;
-            end
-            %else
-            trimmedClusterCenters = clusterCenters;
-            %end
             
             %fprintf('ClusterCenters & clusterAssignments');
             %array2table(clusterMembers, 'VariableNames',{'Num','Dist','Std'})
@@ -501,7 +360,7 @@ classdef bagOfFeatures3 < bagOfFeatures
             %%trimmedClusterCenters = clusterCenters( clusterMemberNum < TL(1), : );
             %%trimmedClusterCenters = clusterCenters( clusterMemberNum < TL(1) | clusterMemberDMean > TS(2) | clusterMemberDStd > TS(3), : );
             %%[n, ~] = size(trimmedClusterCenters);            
-            %trimmedClusterCenters = clusterCenters;
+            trimmedClusterCenters = clusterCenters;
             
             %%this.goodClusterIdx = ( clusterMemberNum < TL(1) | clusterMemberDMean > TS(2) | clusterMemberDStd > TS(3) )';
             %this.goodClusterIdx = ( clusterMemberNum < TL(1) | clusterMemberDStd > TS(3) )'; %best
@@ -512,10 +371,7 @@ classdef bagOfFeatures3 < bagOfFeatures
             %n = sum(this.goodClusterIdx);
             
             %fprintf('bagOfFeatures3: Trimmed clusters number: %d\n', n);
-            %--------EOCHANGED---------------------------------------------            
         end
-        
     end
-    
 end
 
