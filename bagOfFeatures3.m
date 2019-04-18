@@ -9,6 +9,9 @@ classdef bagOfFeatures3 < bagOfFeatures
         goodCalibrBag; 
         badCalibrBag;
         
+        goodDescriptorIdx;
+        badDescriptorIdx;        
+        
         origDescriptors;
         origVocabulary;
         
@@ -27,17 +30,85 @@ classdef bagOfFeatures3 < bagOfFeatures
         
         %------------------------------------------------------------------
         % Constructor
-        function obj = bagOfFeatures3(t_goodCalibrBag, t_badCalibrBag, varargin)
+        function obj = bagOfFeatures3(varargin)
             
             obj = obj@bagOfFeatures(varargin{:});
             
-            obj.goodCalibrBag = t_goodCalibrBag; 
-            obj.badCalibrBag = t_badCalibrBag;
+            %obj.goodCalibrBag = t_goodCalibrBag; 
+            %obj.badCalibrBag = t_badCalibrBag;
 
         end % end of Constructor
+        
+        
+                %------------------------------------------------------------------
+        function calculateGoodFeatureIdx(this, goodCalibrBag, badCalibrBag)
+                        
+            opts = getSearchOptions(this);
+            
+            matchIndex = goodCalibrBag.VocabularySearchTree.knnSearch(this.origDescriptors, 1, opts); % K = 1
+            
+            ithDistDim = this.origDescriptors - goodCalibrBag.Vocabulary(matchIndex, :);
+            ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
+            
+            this.goodDescriptorIdx = (ithDist <= goodCalibrBag.clusterMembers(matchIndex, 6))';
+
+            
+            matchIndex = badCalibrBag.VocabularySearchTree.knnSearch(this.origDescriptors, 1, opts); % K = 1
+            
+            ithDistDim = this.origDescriptors - badCalibrBag.Vocabulary(matchIndex, :);
+            ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
+            
+            this.badDescriptorIdx = (ithDist <= badCalibrBag.clusterMembers(matchIndex, 6))';
+            
+            
+                            
+            [n, ~] = size(this.origDescriptors);
+            
+            %if ~isempty(goodCalibrBag)
+            %    [m, ~] = size(goodCalibrBag.Vocabulary);                
+            %    vocabDif = zeros(n, m);
+            %    vocabGood = false(n, m);
+            
+            %    for i=1:m
+            %        vocabDifDim = this.origDescriptors - goodCalibrBag.Vocabulary(i, :);
+            %        vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
+                    %vocabGood(:, i) = vocabDif(:, i) < goodCalibrBag.clusterMembers(i, 8);
+            %        vocabGood(:, i) = vocabDif(:, i) <= goodCalibrBag.clusterMembers(i, 6);
+            %    end
+            
+            %    this.goodDescriptorIdx = (sum(vocabGood, 2) > 0)';
+
+                k = sum(this.goodDescriptorIdx);            
+                fprintf('bagOfFeatures3: Trimmed by good bag clusters number: %d\n', k);
+            %end
+            
+            %if ~isempty(badCalibrBag)
+            %    [m, ~] = size(badCalibrBag.Vocabulary);                
+            %    vocabDif = zeros(n, m);
+            %    vocabBad = false(n, m);
+            
+            %    for i=1:m
+            %        vocabDifDim = this.origDescriptors - badCalibrBag.Vocabulary(i, :);
+            %        vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
+                    %vocabBad(:, i) = vocabDif(:, i) < badCalibrBag.clusterMembers(i, 7);
+            %        vocabBad(:, i) = vocabDif(:, i) <= badCalibrBag.clusterMembers(i, 6);
+            %    end
+            
+            %    this.badDescriptorIdx = (sum(vocabBad, 2) > 0)';
+
+                k = sum(this.badDescriptorIdx);            
+                fprintf('bagOfFeatures3: Trimmed by bad bag clusters number: %d\n', n-k);
+            %end
+           
+            fprintf('bagOfFeatures3: Not bad and good intersection %d, union %d\n',...
+                sum(this.goodDescriptorIdx & ~this.badDescriptorIdx),...
+                sum(this.goodDescriptorIdx | ~this.badDescriptorIdx));
+            
+        end
+        
          
         %------------------------------------------------------------------
-        function calculateGoodClusterIdx(this, goodCalibrBag, badCalibrBag)
+        %function calculateGoodClusterIdx(this, goodCalibrBag, badCalibrBag)
             
             %minNum = calibrBag.SClusterMembers(1);
             %minDist = calibrBag.SClusterMembers(2);
@@ -63,91 +134,92 @@ classdef bagOfFeatures3 < bagOfFeatures
             %                        this.clusterMembers(:,5) <= maxSStd |...
             %                    this.clusterMembers(:,2) == 0 | this.clusterMembers(:,3) == 0 )';
                             
-            [n, ~] = size(this.origVocabulary);
+        %    [n, ~] = size(this.origVocabulary);
             
-            if ~isempty(goodCalibrBag)
-                [m, ~] = size(goodCalibrBag.Vocabulary);                
-                vocabDif = zeros(n, m);
-                vocabGood = false(n, m);
+        %    if ~isempty(goodCalibrBag)
+        %        [m, ~] = size(goodCalibrBag.Vocabulary);                
+        %        vocabDif = zeros(n, m);
+        %        vocabGood = false(n, m);
             
-                for i=1:m
-                    vocabDifDim = this.origVocabulary - goodCalibrBag.Vocabulary(i, :);
-                    vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
-                    %vocabGood(:, i) = vocabDif(:, i) < this.clusterMembers(:, 2) + 2*this.clusterMembers(:, 3);
-                    vocabGood(:, i) = vocabDif(:, i) < goodCalibrBag.clusterMembers(i, 8);
-                end
+        %        for i=1:m
+        %            vocabDifDim = this.origVocabulary - goodCalibrBag.Vocabulary(i, :);
+        %            vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
+        %            vocabGood(:, i) = vocabDif(:, i) < goodCalibrBag.clusterMembers(i, 8);
+                    %vocabGood(:, i) = vocabDif(:, i) < goodCalibrBag.clusterMembers(i, 6);
+        %        end
             
-                this.goodClusterIdx = (sum(vocabGood, 2) > 0)';
+        %        this.goodClusterIdx = (sum(vocabGood, 2) > 0)';
 
-                k = sum(this.goodClusterIdx);            
-                fprintf('bagOfFeatures3: Trimmed by good bag clusters number: %d\n', k);
-            end
+        %        k = sum(this.goodClusterIdx);            
+        %        fprintf('bagOfFeatures3: Trimmed by good bag clusters number: %d\n', k);
+        %    end
             
-            if ~isempty(badCalibrBag)
-                [m, ~] = size(badCalibrBag.Vocabulary);                
-                vocabDif = zeros(n, m);
-                vocabBad = false(n, m);
+        %    if ~isempty(badCalibrBag)
+        %        [m, ~] = size(badCalibrBag.Vocabulary);                
+        %        vocabDif = zeros(n, m);
+        %        vocabBad = false(n, m);
             
-                for i=1:m
-                    vocabDifDim = this.origVocabulary - badCalibrBag.Vocabulary(i, :);
-                    vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
-                    %vocabGood(:, i) = vocabDif(:, i) < this.clusterMembers(:, 2) + 2*this.clusterMembers(:, 3);
-                    vocabBad(:, i) = vocabDif(:, i) < badCalibrBag.clusterMembers(i, 7);
-                end
+        %        for i=1:m
+        %            vocabDifDim = this.origVocabulary - badCalibrBag.Vocabulary(i, :);
+        %            vocabDif(:, i) = sqrt(sum(vocabDifDim .* vocabDifDim, 2));
+        %            vocabBad(:, i) = vocabDif(:, i) < badCalibrBag.clusterMembers(i, 7);
+                    %vocabBad(:, i) = vocabDif(:, i) < badCalibrBag.clusterMembers(i, 6);
+        %        end
             
-                this.badClusterIdx = (sum(vocabBad, 2) > 0)';
+        %        this.badClusterIdx = (sum(vocabBad, 2) > 0)';
 
-                k = sum(this.badClusterIdx);            
-                fprintf('bagOfFeatures3: Trimmed by bad bag clusters number: %d\n', n-k);
-            end
+        %        k = sum(this.badClusterIdx);            
+        %        fprintf('bagOfFeatures3: Trimmed by bad bag clusters number: %d\n', n-k);
+        %    end
            
-            fprintf('bagOfFeatures3: Not bad and good intersection %d, union %d\n',...
-                sum(this.goodClusterIdx & ~this.badClusterIdx),...
-                sum(this.goodClusterIdx | ~this.badClusterIdx));
+        %    fprintf('bagOfFeatures3: Not bad and good intersection %d, union %d\n',...
+        %        sum(this.goodClusterIdx & ~this.badClusterIdx),...
+        %        sum(this.goodClusterIdx | ~this.badClusterIdx));
             
-        end
+        %end
+        
         
         %------------------------------------------------------------------
-        function [goodDescriptors, goodMetrics, goodPoints,...
-                badDescriptors, badMetrics, badPoints] = extractGoodFeatures(this, img)
+        %function [goodDescriptors, goodMetrics, goodPoints,...
+        %        badDescriptors, badMetrics, badPoints] = extractGoodFeatures(this, img)
                                       
-            [descriptors, metrics, locations] = this.Extractor(img);
-            points = this.determineExtractionPoints(img);
+        %    [descriptors, metrics, locations] = this.Extractor(img);
+        %    points = this.determineExtractionPoints(img);
                                 
-            opts = getSearchOptions(this);
+        %    opts = getSearchOptions(this);
             
-            matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
+        %    matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
             
-            [m, ~] = size(this.Vocabulary);
-            goodClusterIdx2 = true(1, m);
-            badClusterIdx2 = true(1, m);
+        %    [m, ~] = size(this.Vocabulary);
+        %    goodClusterIdx2 = true(1, m);
+        %    badClusterIdx2 = true(1, m);
             
-            if ~isempty(this.goodClusterIdx)
-                goodClusterIdx2 = goodClusterIdx2 & this.goodClusterIdx;
-            end    
-            if ~isempty(this.badClusterIdx)
-                goodClusterIdx2 = goodClusterIdx2 & ~this.badClusterIdx;
-            end
+        %    if ~isempty(this.goodClusterIdx)
+        %        goodClusterIdx2 = goodClusterIdx2 & this.goodClusterIdx;
+        %    end    
+        %    if ~isempty(this.badClusterIdx)
+        %        goodClusterIdx2 = goodClusterIdx2 & ~this.badClusterIdx;
+        %    end
            
-            if ~isempty(this.badClusterIdx)
-                badClusterIdx2 = badClusterIdx2 & this.badClusterIdx;
-            end    
-            if ~isempty(this.goodClusterIdx)
-                badClusterIdx2 = badClusterIdx2 & ~this.goodClusterIdx;
-            end
+        %    if ~isempty(this.badClusterIdx)
+        %        badClusterIdx2 = badClusterIdx2 & this.badClusterIdx;
+        %    end    
+        %    if ~isempty(this.goodClusterIdx)
+        %        badClusterIdx2 = badClusterIdx2 & ~this.goodClusterIdx;
+        %    end
             
             
-            goodDescriptors = descriptors( goodClusterIdx2(matchIndex), :);
-            goodMetrics = metrics( goodClusterIdx2(matchIndex), :);
-            goodLocations = locations( goodClusterIdx2(matchIndex), :);
-            goodPoints = points( goodClusterIdx2(matchIndex), :);
+        %    goodDescriptors = descriptors( goodClusterIdx2(matchIndex), :);
+        %    goodMetrics = metrics( goodClusterIdx2(matchIndex), :);
+        %    goodLocations = locations( goodClusterIdx2(matchIndex), :);
+        %    goodPoints = points( goodClusterIdx2(matchIndex), :);
             
-            badDescriptors = descriptors( badClusterIdx2(matchIndex), :);
-            badMetrics = metrics( badClusterIdx2(matchIndex), :);
-            badLocations = locations( badClusterIdx2(matchIndex), :);
-            badPoints = points( badClusterIdx2(matchIndex), :);
+        %    badDescriptors = descriptors( badClusterIdx2(matchIndex), :);
+        %    badMetrics = metrics( badClusterIdx2(matchIndex), :);
+        %    badLocations = locations( badClusterIdx2(matchIndex), :);
+        %    badPoints = points( badClusterIdx2(matchIndex), :);
                       
-        end         
+        %end         
 
 
         %------------------------------------------------------------------
@@ -164,7 +236,7 @@ classdef bagOfFeatures3 < bagOfFeatures
             ithDistDim = descriptors - this.Vocabulary(matchIndex, :);
             ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
             
-            goodIdx = ithDist < this.clusterMembers(matchIndex, 8);
+            goodIdx = ithDist <= this.clusterMembers(matchIndex, 6);
             goodDescriptors = descriptors( goodIdx, :);
             goodMetrics = metrics( goodIdx, :);
             goodPoints = points( goodIdx, :);
@@ -177,35 +249,56 @@ classdef bagOfFeatures3 < bagOfFeatures
         
         
         %------------------------------------------------------------------
-        function [goodDescriptors] = filterGoodFeaturesByDist(this, descriptors)                                     
-                                
+        function [goodDescriptors] = filterGoodFeaturesByDist(this, descriptors)
+                 
             opts = getSearchOptions(this);
             
-            matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
-                   
             
+            
+            %matchIndex = this.goodCalibrBag.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
+            
+            %ithDistDim = descriptors - this.goodCalibrBag.Vocabulary(matchIndex, :);
+            %ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
+            
+            %this.goodDescriptorIdx = (ithDist <= this.goodCalibrBag.clusterMembers(matchIndex, 6))';
+
+            
+            %matchIndex = this.badCalibrBag.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
+            
+            %ithDistDim = descriptors - this.badCalibrBag.Vocabulary(matchIndex, :);
+            %ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
+            
+            %this.badDescriptorIdx = (ithDist <= this.badCalibrBag.clusterMembers(matchIndex, 6))';
+            
+            %goodDescriptorIdx2 = this.goodDescriptorIdx | ~this.badDescriptorIdx;
+            %goodDescriptors = descriptors(goodDescriptorIdx2, :);
+                                
+            
+            
+            matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
+                               
             ithDistDim = descriptors - this.Vocabulary(matchIndex, :);
             ithDist = sqrt(sum(ithDistDim .* ithDistDim, 2));
-            goodDescriptors = descriptors( ithDist < this.clusterMembers(matchIndex, 8), :);
-            %goodDescriptors = descriptors( ithDist < this.clusterMembers(matchIndex, 6), :);
+            goodDescriptors = descriptors( ithDist <= this.clusterMembers(matchIndex, 6), :);
             
         end        
-        
+              
         
         %------------------------------------------------------------------
-        function [goodDescriptors] = filterGoodFeatures(this, descriptors)
+        %function [goodDescriptors] = filterGoodFeatures(this, descriptors)
                                                                 
-            opts = getSearchOptions(this);
+        %    opts = getSearchOptions(this);
             
-            matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
+        %    matchIndex = this.VocabularySearchTree.knnSearch(descriptors, 1, opts); % K = 1
             
             %goodClusterIdx2 = this.goodClusterIdx & ~this.badClusterIdx;
-            goodClusterIdx2 = this.goodClusterIdx | ~this.badClusterIdx;
+        %    goodClusterIdx2 = this.goodClusterIdx | ~this.badClusterIdx;
             %goodClusterIdx2 = ~this.badClusterIdx;
             %goodClusterIdx2 = this.goodClusterIdx;
             
-            goodDescriptors = descriptors( goodClusterIdx2(matchIndex), :);
-        end 
+        %    goodDescriptors = descriptors( goodClusterIdx2(matchIndex), :);
+        %end 
+
         
         %------------------------------------------------------------------
         function trimmedClusterCenters = recreateVocabulary(this, t_goodCalibrBag, t_badCalibrBag)
@@ -213,7 +306,14 @@ classdef bagOfFeatures3 < bagOfFeatures
             this.goodCalibrBag = t_goodCalibrBag; 
             this.badCalibrBag = t_badCalibrBag;
 
-            [goodDescriptors] = this.filterGoodFeatures(this.origDescriptors);
+            
+            %this.calculateGoodClusterIdx(this.goodCalibrBag, this.badCalibrBag);
+            %[goodDescriptors] = this.filterGoodFeatures(this.origDescriptors);
+
+            this.calculateGoodFeatureIdx(this.goodCalibrBag, this.badCalibrBag);
+            goodDescriptorIdx2 = this.goodDescriptorIdx | ~this.badDescriptorIdx;
+            goodDescriptors = this.origDescriptors(goodDescriptorIdx2, :);
+            
             
             numDescriptors = size(goodDescriptors, 1);
             %--------EOCHANGED---------------------------------------------
@@ -268,7 +368,7 @@ classdef bagOfFeatures3 < bagOfFeatures
                 
                 clusterMemberDMax(i) = max(ithDist);
                 clusterMemberDPrcS(i) = prctile(ithDist, 90); %bad
-                clusterMemberDPrcL(i) = prctile(ithDist, 85); %good 75 82 90
+                clusterMemberDPrcL(i) = prctile(ithDist, 90); %good 75 85! 90
             end
             
             this.clusterMembers = [clusterMemberNum, clusterMemberDMean,... 
@@ -415,8 +515,8 @@ classdef bagOfFeatures3 < bagOfFeatures
             % New from here for bad/good clusters calibration bags
             %--------------------------------------------------------------
             
-            global goodCalibrBag
-            global badCalibrBag
+            %global goodCalibrBag
+            %global badCalibrBag
             
             this.origDescriptors = descriptors;
 
@@ -457,8 +557,8 @@ classdef bagOfFeatures3 < bagOfFeatures
                 clusterMemberSStd(i) = mean(std(abs(ithDescriptors), 0, 2));
                 
                 clusterMemberDMax(i) = max(ithDist);
-                clusterMemberDPrcS(i) = prctile(ithDist, 99); %bad 90
-                clusterMemberDPrcL(i) = prctile(ithDist, 99); %good 99
+                clusterMemberDPrcS(i) = prctile(ithDist, 90); %bad 90
+                clusterMemberDPrcL(i) = prctile(ithDist, 90); %good 99
             end
             
             this.clusterMembers = [clusterMemberNum, clusterMemberDMean,... 
@@ -466,14 +566,14 @@ classdef bagOfFeatures3 < bagOfFeatures
                 clusterMemberDMax, clusterMemberDPrcS, clusterMemberDPrcL];
           
 
-            if ~isempty(goodCalibrBag) && ~isempty(badCalibrBag)
-                this.goodCalibrBag = goodCalibrBag;
-                this.badCalibrBag = badCalibrBag;
-                this.calculateGoodClusterIdx(this.goodCalibrBag, this.badCalibrBag);
-                %trimmedClusterCenters = clusterCenters(this.goodClusterIdx & ~this.badClusterIdx,:); 
-                %[K, ~] = size(trimmedClusterCenters);
-                %this.VocabularySize = K;
-            end
+            %if ~isempty(goodCalibrBag) && ~isempty(badCalibrBag)
+            %    this.goodCalibrBag = goodCalibrBag;
+            %    this.badCalibrBag = badCalibrBag;
+            %    this.calculateGoodClusterIdx(this.goodCalibrBag, this.badCalibrBag);
+            %    %trimmedClusterCenters = clusterCenters(this.goodClusterIdx & ~this.badClusterIdx,:); 
+            %    %[K, ~] = size(trimmedClusterCenters);
+            %    %this.VocabularySize = K;
+            %end
             %else
             trimmedClusterCenters = clusterCenters;
             %end

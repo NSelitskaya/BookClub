@@ -27,22 +27,22 @@ countEachLabel(trainingSet)
                             
 %% Create a small set and bag with Face Detector feature extractor to calibrate 
 % parameters of clusters typical for faces in the base set
-[calibrSet, ~] = splitEachLabel(baseSet, 0.04, 'randomize'); 
+[calibrSet, ~] = splitEachLabel(baseSet, 0.05, 'randomize'); 
 
-global goodCalibrBag
-global badCalibrBag
+%global goodCalibrBag
+%global badCalibrBag
 
-goodCalibrBag = bagOfFeatures3([], [], calibrSet, 'CustomExtractor', @extractFaceSURFFeatures,...
+goodCalibrBag = bagOfFeatures3(calibrSet, 'CustomExtractor', @extractFaceSURFFeatures,...
                     'VocabularySize', 50, 'StrongestFeatures', 0.8,... 
                     'UseParallel', true);
                 
-badCalibrBag = bagOfFeatures3([], [], calibrSet, 'CustomExtractor', @extractNoFaceSURFFeatures,...
+badCalibrBag = bagOfFeatures3(calibrSet, 'CustomExtractor', @extractNoFaceSURFFeatures,...
                     'VocabularySize', 50, 'StrongestFeatures', 0.8,... 
                     'UseParallel', true);               
 
 %% Detect features on the trainingSet and build basis (vocabulary) of the bag
                 
-bag = bagOfFeatures3(goodCalibrBag, badCalibrBag, trainingSet,...
+bag = bagOfFeatures3(trainingSet,...
                     'PointSelection', 'Detector',...
                     'Upright', false, 'VocabularySize', 5000,...
                     'StrongestFeatures', 0.8, 'UseParallel', true);
@@ -87,7 +87,8 @@ testDataSetLabels = strings(nMakeups, 1);
 
 
 %% Run classifiers in parallel for each makeup test set
-parfor i=1:nMakeups    
+%par
+for i=1:nMakeups    
 
     % Extract true label of the test subset (from the first full file name)
     [tmpStr, ~] = strsplit(testSets{i}.Files{1,1}, '/');

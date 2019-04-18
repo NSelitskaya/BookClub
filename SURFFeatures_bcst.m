@@ -132,14 +132,14 @@ fprintf("Average sessionwise accuracy %f\n", mean(testDataSetLabels' == [mkTable
 
 %% Pre-extract SURF features and slice training set by labels once,
 % without doing that for each test set when finding matches below
-%[trainSets, trainFeatures, trainMetrics] = preextractSURFFeatures(bag, trainingSet);
+[trainSets, trainFeatures, trainMetrics] = preextractSURFFeatures(bag, trainingSet);
 
 %% Iterate throug makeup test sets and find images with best (most numerous)
 % matches between each test set and training sub-sets sliced by labels
-%for i=1:nMakeups           
+for i=1:nMakeups           
 
-%    showSURFFeatureMatchesConfusion(bag, trainingSet, trainSets, trainFeatures,...
-%        trainMetrics, testSets{i}, categoryClassifier,...
-%        predictedLabelIdx{i}, outFolder, mkTable(i,:));
+    showSURFFeatureMatchesConfusion(bag, trainingSet, trainSets, trainFeatures,...
+        trainMetrics, testSets{i}, categoryClassifier,...
+        predictedLabelIdx{i}, outFolder, mkTable(i,:));
 
-% end    
+ end    

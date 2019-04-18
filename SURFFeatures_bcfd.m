@@ -11,7 +11,7 @@ outFolder = '~/data/BCTutorialOut';
 
 
 %% Create imageDataset of all images in selected baseline folders
-[baseSet, dataSetFolder] = createBCbaselineIDS2(dataFolderTmpl,...
+[baseSet, dataSetFolder] = createBCbaselineIDS3(dataFolderTmpl,...
                             dataFolderSfx, @readFunctionGray_n);
 trainingSet = baseSet;
 
@@ -54,7 +54,7 @@ categoryClassifier = trainImageCategoryClassifier(trainingSet, bag,...
  
 %% Makeup datasets  
 % Create imageDataset vector of images in selected makeup folders
-[testSets, testDataSetFolders] = createBCtestIDSvect2DR(dataFolderTmpl,...
+[testSets, testDataSetFolders] = createBCtestIDSvect3(dataFolderTmpl,...
                                 dataFolderSfx, @readFunctionGray_n);
 
 
